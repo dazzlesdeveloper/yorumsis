@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yorum Yönetimi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Genel Stil Ayarları */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            color: #34495e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden; /* Yatay kaydırmayı engelle */
+        }
+    
+        /* Container Stil Ayarları */
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    
+        /* Başlık Stil Ayarları */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    
+        /* Şehir Butonları Stil Ayarları */
+        .city-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start; /* Butonları sola hizala */
+            align-items: flex-start; /* Üstten hizala */
+            margin-bottom: 30px;
+            padding: 0 20px; /* Sağa ve sola boşluk ekle */
+        }
+    
+        .city-button {
+            padding: 12px 24px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+    
+        .city-button:hover {
+            background-color: #2980b9;
+        }
+    
+        /* Yorum Listesi Stil Ayarları */
+        .comment-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left; /* Yorumları sol hizala */
+        }
+    
+        .comment-item {
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .comment-item:hover {
+            background-color: #d5dbdb;
+        }
+    
+        .comment-item.read {
+            background-color: #aab7b8;
+            color: #fff;
+        }
+    
+        /* Yorum Detayları Stil Ayarları */
+        .comment-details {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f0f3f4;
+            text-align: left;
+        }
+    
+        .comment-details h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    
+        .comment-details p {
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+    
+        .comment-details strong {
+            color: #2c3e50;
+        }
+    
+        .comment-details button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+    
+        .comment-details button:hover {
+            background-color: #c0392b;
+        }
+    
+        /* Mobil Uyumlu Stil Ayarları */
+        @media (max-width: 600px) {
+            .container {
+                width: 100%;
+                padding: 20px;
+            }
+    
+            .city-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center; /* Butonları ortala */
+                align-items: flex-start; /* Üstten hizala */
+                margin-bottom: 20px;
+                padding: 25 45px; /* Sağa ve sola boşluk ekle */
+            }
+    
+            .city-button {
+                width: calc(50% - 30px); /* İki buton yan yana ve boşluklar */
+                margin: 10px; /* Üst, alt ve yan boşluklar */
+                box-sizing: border-box; /* Padding ve border genişliğe dahil */
+                font-size: 14px;
+                padding: 8px; /* İç boşluğu azalt */
+                text-align: center; /* Metni ortala */
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Yorum Yönetimi</h1>
+
+        <div class="city-buttons">
+            <button class="city-button" data-city="Sivas">Sivas</button>
+            <button class="city-button" data-city="Aksaray">Aksaray</button>
+            <button class="city-button" data-city="Kayseri">Kayseri</button>
+            <button class="city-button" data-city="Nevşehir">Nevşehir</button>
+            <button class="city-button" data-city="Niğde">Niğde</button>
+        </div>
+
+        <ul id="commentList" class="comment-list"></ul>
+
+        <div id="commentDetails" class="comment-details" style="display: none;">
+            <h3>Yorum Detayları</h3>
+            <p><strong>Ad Soyad:</strong> <span id="detailName"></span></p>
+            <p><strong>Telefon:</strong> <span id="detailPhone"></span></p>
+            <p><strong>Mesaj:</strong> <span id="detailMessage"></span></p>
+            <button id="deleteCommentButton"><i class="fas fa-trash"></i> Yorumu Sil</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase yapılandırması
+        const firebaseConfig = {
+    apiKey: "AIzaSyCIhKXxTwmQ1l70c7_vnH6ZmM1FxZsqUEI",
+    authDomain: "furkan-baysak-b74ef.firebaseapp.com",
+    databaseURL: "https://furkan-baysak-b74ef-default-rtdb.firebaseio.com",
+    projectId: "furkan-baysak-b74ef",
+    storageBucket: "furkan-baysak-b74ef.firebasestorage.app",
+    messagingSenderId: "332668884342",
+    appId: "1:332668884342:web:975a46d869cf37bbc85657",
+    measurementId: "G-1TQKFHW50T"
+    };
+    
+        // Firebase'i başlat
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+    
+        const commentList = document.getElementById('commentList');
+        const commentDetailsDiv = document.getElementById('commentDetails');
+        const detailNameSpan = document.getElementById('detailName');
+        const detailPhoneSpan = document.getElementById('detailPhone');
+        const detailMessageSpan = document.getElementById('detailMessage');
+        const deleteCommentButton = document.getElementById('deleteCommentButton');
+    
+        let selectedCity = '';
+        let selectedCommentKey = '';
+    
+        // Şehir butonlarına tıklama olayları
+        const cityButtons = document.querySelectorAll('.city-button');
+        cityButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                selectedCity = button.dataset.city;
+                loadComments(selectedCity);
+            });
+        });
+    
+        // Yorumları yükle
+        function loadComments(city) {
+            commentList.innerHTML = ''; // Önceki yorumları temizle
+            commentDetailsDiv.style.display = 'none'; // Yeni şehir seçildiğinde yorum detaylarını kapat
+    
+            database.ref(`comments/${city}`).once('value')
+                .then(snapshot => {
+                    const comments = snapshot.val();
+                    if (comments) {
+                        Object.keys(comments).forEach(name => {
+                            const comment = comments[name];
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('comment-item');
+                            listItem.innerHTML = `<span>${name}</span><i class="fas fa-chevron-right"></i>`;
+    
+                            // Okunmuş/Okunmamış durumunu kontrol et
+                            if (comment.read) {
+                                listItem.classList.add('read');
+                            }
+    
+                            listItem.addEventListener('click', () => {
+                                showCommentDetails(city, name, comment);
+                                selectedCommentKey = name; // Seçilen yorumun anahtarını sakla
+    
+                                // Yorumu okunmuş olarak işaretle
+                                markCommentAsRead(city, name);
+                                listItem.classList.add('read'); // Görsel olarak okunmuş olarak işaretle
+                            });
+    
+                            commentList.appendChild(listItem);
+                        });
+                    } else {
+                        commentList.innerHTML = '<p>Yorum bulunamadı.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error("Veri çekme hatası:", error);
+                    commentList.innerHTML = '<p>Veri çekilirken bir hata oluştu.</p>';
+                });
+        }
+    
+        // Yorum detaylarını göster
+        function showCommentDetails(city, name, comment) {
+            detailNameSpan.textContent = name;
+            detailPhoneSpan.textContent = comment.phone;
+            detailMessageSpan.textContent = comment.text;
+            commentDetailsDiv.style.display = 'block';
+    
+            // Yorumu sil butonu tıklama olayı
+            deleteCommentButton.onclick = () => {
+                deleteComment(city, name);
+            };
+        }
+    
+        // Yorumu sil
+        function deleteComment(city, name) {
+            console.log("Silinecek yorum:", city, name);
+    
+            if (confirm('Bu yorumu silmek istediğinizden emin misiniz?')) {
+                database.ref(`comments/${city}/${name}`).remove()
+                    .then(() => {
+                        console.log("Yorum başarıyla silindi:", city, name);
+                        alert('Yorum silindi!');
+                        commentDetailsDiv.style.display = 'none';
+                        loadComments(city); // Yorumları yeniden yükle
+                    })
+                    .catch(error => {
+                        console.error("Silme hatası:", error);
+                        alert('Yorum silinirken bir hata oluştu: ' + error.message);
+                    });
+            } else {
+                alert('Yorum silme işlemi iptal edildi.');
+            }
+        }
+    
+        // Yorumu okunmuş olarak işaretle
+        function markCommentAsRead(city, name) {
+            database.ref(`comments/${city}/${name}`).update({ read: true })
+                .catch(error => {
+                    console.error("Okunmuş olarak işaretleme hatası:", error);
+                });
+        }
+    </script>
+</body>
+</html>
